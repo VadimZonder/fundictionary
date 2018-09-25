@@ -38,7 +38,6 @@
     <link href="assets/stylesheets/pe-icon-7-stroke.css" rel="stylesheet">-->
    <% stylesheet_link_tag "pe-icon-7-stroke"%>
     
-
     
     <link href="https://ajax.googleapis.com/ajax/libs/jquery/3.0.1/jquery.min.js">
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
@@ -48,7 +47,16 @@
 </head>
 
 <body>
- 
+<div class="content purple-horizontal">
+    <div class="col-md-12">
+       
+        <div class="header">
+            <div class="container-fluid">
+                
+                <h2>You searched for "<%#= @search_term2 %>" </h2>
+                
+
+
  <%= render 'layouts/header' %>
 
 
@@ -60,23 +68,248 @@
         <div class="row">
            <!--PARENT WINDOW -->
            <!--the line below is taken from a template + I changed the size-->
-           <div class="col-md-6 hover" >
+           <div class="col-md-12 hover" >
              <!--the line below is taken from a template and I added a class--> 
              <div class="card  purple-button ">
-
+ <%= render 'layouts/search' %>
                  
-                <%= link_to({:controller => 'parents', :action => 'index'}) do %>
+                <%#= link_to({:controller => 'parents', :action => 'index'}) do %>
                 <div class="header ">
+                      <%
+                            require "nokogiri" 
+                          require "rest-client"
+                          
+                        # @urlBasic = "http://www.yourdictionary.com/"
+                          
+                         urlFull="https://www.iplocation.net/"
+
+                          html=RestClient.get(urlFull)
+                          
+                          @urlSplit = urlFull.split('/')
+                           
+                           
+                           
+                            agent = Mechanize.new
+                           page = agent.get('https://free-proxy-list.net/anonymous-proxy.html')
+                         # @table = page.at('table')
+
+                          #page.at('table').search('tr').each do |row|
+                             #cells = row.search('th td').map { |cell| cell.text.strip }
+                             # @table2 =  @table2 + cells
+                         # end
+                         @agentAlias = [
+                     "Linux Firefox", "Linux Konqueror","Linux Mozilla", 
+                     "Mac Firefox","Mac Mozilla","Mac Safari", 
+                     "Mac Safari 4", "Windows IE 6","Windows IE 7", "Windows IE 8",
+                     "Windows IE 9","Windows IE 10","Windows IE 11", 
+                     "Windows Edge", "Windows Mozilla","Windows Firefox", 
+                     "iPhone","iPad", "Android"
+                      ]
+                      #!!!!!!!!!!!first check if it works with random aliases then attach one to an ip address to archive
+                      
+                     @agentAliasRandom = @agentAlias.shuffle.first
+                           %>
+                    
+                            <div class="content table-responsive table-full-width">
+                  <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <!--changing css left right center + deleteing some fields-->
+                            <th class="text-left">Text</th>
+                             
+
+                            
+                        </tr>
+                    </thead>
                    
+                  <tbody>
+                       <%#= randomNumber = rand(1, 9, 17).to_i%>
+                       <%#= creatin a list of numbers at which index ip is licated and pick them randomly by samplei%>
+                       <%randomNumber = [1, 9, 17, 25, 33, 41, 49, 57, 65, 73, 81, 89, 97, 105, 113, 121, 129, 137, 145, 153].sample%>
+                        <%# split the table with all the info into 8 colums%>
+                        <% page.at('table').search('td').each_slice(8)  do |row1, row2, row3, row4, row5, row6 , row7 , row8  | %>
+                        <%# if randomly picked index is == torow with a list of IP idexes %>
+                       <% if page.at('table').search('td').index(row1) + 1 == randomNumber %>
+                        <% @randomIP = row1.text.strip%>
+                        <% @randomPort = row2.text.strip%>
+                         
+                        <% end %>
+                        
+                         <% # save rows 1 and 2 into a array object%>
+                        <% @devideRow = [row1.text.strip, row2.text.strip]%>
+                        <% @devideRow1 = [row1.text.strip]%>
+                        <%# once used create archi t obe reused once in a while-archive of 1021%>
+                      
+                        
+                        
+                        <%# randomly select each even number(IP) and +1 index will be its port   + @devideRow.index[@randomIPIndex]%>
+                        
+                         <%#= @randomIPIndex = @devideRow.index(@randomIP).to_s%>
+                         <% end %>
+                          
+                         <td class="text-center"><%= "IP " + @randomIP.to_s + " PORT " + @randomPort  + " Browser " + @agentAliasRandom%></td>
+                         <%# need to save it to DB since all will clear on refresh IP-string, Port-string and lastInserted-integer%>
+                         <%  
+                         object = Archive.new(:ip => @randomIP, :port => @randomPort, :browser => @agentAliasRandom)
+                        object.save
+
+                         %>
+                         
+                          
+                         <%#randomise data in DB and pick first______________________________________%>
+                          <% @fromArchiveRandom = @archive.shuffle.first%>
+                          <% @fromArchiveRandomIP = @fromArchiveRandom.ip%>
+                          <% @fromArchiveRandomPort = @fromArchiveRandom.port%>
+                          <% @fromArchiveRandomBrowser = @fromArchiveRandom.browser%>
+                               <tr>
+                                     <td class="text-center">From Archive: </td>
+                            <td class="text-center"><%= @fromArchiveRandomIP%></td>
+                              <td class="text-center"><%= @fromArchiveRandomPort%></td>
+                               <td class="text-center"><%=@fromArchiveRandomBrowser%></td>
+                        </tr></td>
+                         <%#randomise data in DB and pick first______________________________________%>
+                         
+                         
+                        <%
+                         
+                         
+                         
+                         
+                         # now send a request to fundictionary with diff ips ______________________________________
+agent2 = Mechanize.new
+#create an array of working ip addresses and a corresponding port that can be called by indexses (or automaticall get from 'https://free-proxy-list.net/anonymous-proxy.html' and others)
+agent2.set_proxy @fromArchiveRandomIP, @fromArchiveRandomPort
+#IMPORTAN get all the possible info collected about 1.the client. 2. changeIP, 3.Change cookies. 4.Time and frequency randomised. 5. Browser and etc  P.S. delete this line
+#create an array of browsers
+agent.user_agent_alias = @fromArchiveRandomBrowser
+
+###change to the desired site
+
+page2 = agent2.get('https://toptenjokes.herokuapp.com/')
+###page3 = agent3.get('https://www.iplocation.net/')
+#random function 10.2 minutes
+@title = page2.title
+##@ip_address = request.remote_ip
+
+#@another_ip=request.headers['HTTP_X_FORWARDED_FOR']
+##@p = page2.at('p').text.strip
+#@body = page.at('body').text.strip
+#####@table =page2.at('table').text.strip 
+#puts "the tile of the page is: "#+title
+
+# now send a request to fundictionary with diff ips ______________________________________
+%>
+<h4 class="title">the tietle of the page is  "<%=@title  %>" and your IP is "<%@fromArchiveRandomIP  %>" ,PORT "<%= @fromArchiveRandomPort%>" and Browser "<%= @fromArchiveRandomBrowser%>"</h4>
+<br>
+<h4 class="title">Calling with this info: <%###=@table  %></h4>
+
+
+<%#begin no make a RAND PERIODIC CALLS 10.2 minutes ______________________________________%>
+
+  <INPUT TYPE="button" id="myButtonId" VALUE="Reload Page" onClick="history.go(0)">
+      <script>
+      var randomSeconds = Math.floor(Math.random() * 1000011);  
+          setInterval(function () {document.getElementById("myButtonId").click();}, randomSeconds);
+      </script>
+   
+<%#end RAND PERIODIC CALLS ______________________________________%>
+
+                         
+                         
+                          <%#@archive.shuffle.each do |entry|%>
+                               <tr>
+                            <td class="text-center"><%#= entry.ip%></td>
+                              <td class="text-center"><%#= entry.port%></td>
+                        </tr>
+                          <%#end %>
+                          <%#see all the data in DB______________________________________%>
+                         
+                         <%# print each remaining row%>
+                        <%# @devideRow1.each  do |row| %>
+                     
+                        <%# end %>
+  
+                    
+                    </tbody>
+                </table>
+            </div>
+            
+            
                   
-                    <h4 class="title">Parent</h4>
-                    <p class="category">See your student's results </p>
+                    <h4 class="title">Title  "<%=@urlSplit[-1]  %>"</h4>
+                    <br>
+                                      
+                    
+                    
+                    <p class="category">See your student's results "<%#=@search_term %>" </p>
                 </div>
                 
                 
                 <div class="content">
                     <!--content space-->
-                    <br><br><br><br><br>
+                    <br><br><br>
+                   <%= 
+                         
+                           doc=Nokogiri::HTML.parse(html)
+                          
+                          
+                          
+                          articles=doc.css('.sense')#.text#.html_safe#
+                         
+                         #defn = articles.at_css "ol"
+                         defnToHtml = articles.to_html
+                        defnToHtml.html_safe
+                          
+                          %>
+                    
+                    
+                    
+                    
+                    
+                  <%# !!!!! ADD A SEARCH BAR THAT ON SUBMIT WILL ADD SEARCHED TERM TO THE END OF THE URL AND SEARCH%>  
+                     <%#working code
+                            require "nokogiri" 
+                          require "rest-client"
+                          
+                         @urlBasic = "http://www.yourdictionary.com/"
+                          
+                         urlFull="http://www.yourdictionary.com/contrast"
+
+                          html=RestClient.get(urlFull)
+                          
+                          @urlSplit = urlFull.split('/')
+                           
+                          
+                           %>
+                  
+                    <h4 class="title">Definition of "<%=@urlSplit[-1]  %>"</h4>
+                    <p class="category">See your student's results "<%=@search_term %>" </p>
+                </div>
+                
+                
+                <div class="content">
+                    <!--content space-->
+                    <br><br><br>
+                   <%= 
+                         
+                           doc=Nokogiri::HTML.parse(html)
+                          
+                          
+                          
+                          articles=doc.css('.sense')#.text#.html_safe#
+                         
+                         #defn = articles.at_css "ol"
+                         defnToHtml = articles.to_html
+                        defnToHtml.html_safe
+                          
+                          %>
+                    
+                    
+                    
+                    
+                    
+                    
+                    <br><br>
                     <!-- <div id="chartPreferences" class="ct-chart ct-perfect-fourth"></div>-->
                     <%# link_to image_tag("parents.jpg",class:"image-buttons", id:"parents_image", :size => '168x98') %>
 
@@ -98,21 +331,21 @@
                </div>
            </div>
        </div>
-       <% end %>  
+       <%# end %>  
        <!--PARENT WINDOW  END-->
        
        <!--TEACHER WINDOW  --> 
-       <!-- the same applies to the rest of the code. The elemets that I've already declare that are comming form the template are similar below-->
+       <!-- the same applies to the rest of the code. The elemets that I've already declare that are comming form the template are similar below
        <div class="col-md-6 hover" >
         <div class="card  purple-button ">
            
-           <%= link_to({:controller => 'students', :action => 'index'}) do%>
+           <%#= link_to({:controller => 'students', :action => 'index'}) do%>
            <div class="header">
             <h4 class="title">Teacher</h4>
             <p class="category">Mark your student</p>
         </div>
         <div class="content">
-            <!--content space-->
+            <!--content space-->                 <!--
             <br><br><br><br><br>
 
        
@@ -131,9 +364,9 @@
     </div>
 </div>
 </div>
-<% end %>  
+<%# end %>  
 
-<!--END TEACHER WINDOW  STATISTICS FIRST BIT OF CONTENT-->  
+<!--END TEACHER WINDOW  STATISTICS FIRST BIT OF CONTENT-->                  <!--
 <div class="row">
     <div class="col-md-6">
         <div class="card ">
@@ -142,7 +375,7 @@
                 <p class="category">Would you like to know more about us?</p>
             </div>
             <div class="content">
-                <!--<div id="chartActivity" class="ct-chart"></div>-->
+                <!--<div id="chartActivity" class="ct-chart"></div>-->                 <!--
                 <div class="youtube">
                     <iframe width="auto" height="auto" src="https://www.youtube.com/embed/uBfnNGWW-jg">
                     </iframe>
@@ -151,7 +384,7 @@
                         </div>
                     </div>
                 </div>
-                <!--END TEACHER WINDOW  STATISTICS FIRST BIT OF CONTENT-->  
+                <!--END TEACHER WINDOW  STATISTICS FIRST BIT OF CONTENT-->                         <!--
                 
                 <div class="col-md-6">
                     <div class="card ">
@@ -166,14 +399,14 @@
                                         <tr>
                                             <td>
                                             </td>
-                                            <td><%= link_to "Storm Emma: Department of Education 'monitoring' situation as Ireland braces for 'exceptional weather event", "https://www.independent.ie/irish-news/storm-emma/storm-emma-department-of-education-monitoring-situation-as-ireland-braces-for-exceptional-weather-event-36648134.html",  :class => "a", :target => "_blank"%></td>
+                                            <td><%#= link_to "Storm Emma: Department of Education 'monitoring' situation as Ireland braces for 'exceptional weather event", "https://www.independent.ie/irish-news/storm-emma/storm-emma-department-of-education-monitoring-situation-as-ireland-braces-for-exceptional-weather-event-36648134.html",  :class => "a", :target => "_blank"%></td>
                                         </tr>
                                         
                                         <tr>
                                             <td>
                                             
                                             </td>
-                                            <td><%= link_to "Leaving Certificate Agricultural Science Higher Level: 'Well balanced and manageable","https://www.independent.ie/irish-news/education/exams/leaving-certificate-agricultural-science-higher-level-well-balanced-and-manageable-30368739.html",  :class => "a", :target => "_blank"%></td>
+                                            <td><%#= link_to "Leaving Certificate Agricultural Science Higher Level: 'Well balanced and manageable","https://www.independent.ie/irish-news/education/exams/leaving-certificate-agricultural-science-higher-level-well-balanced-and-manageable-30368739.html",  :class => "a", :target => "_blank"%></td>
                                             
                                         </tr>
                                         <tr>
@@ -181,7 +414,7 @@
                                                
                                             </td>
                                             <td> 
-                                                <%= link_to "Girls make grade again in Junior Cert results","https://www.irishtimes.com/news/education/girls-earn-better-results-than-boys-in-junior-cert-1.2792898",  :class => "a", :target => "_blank"%></td>
+                                                <%#= link_to "Girls make grade again in Junior Cert results","https://www.irishtimes.com/news/education/girls-earn-better-results-than-boys-in-junior-cert-1.2792898",  :class => "a", :target => "_blank"%></td>
                                             </td>
                                             
                                         </tr>
@@ -190,7 +423,7 @@
                                                
                                             </td>
                                             <td>
-                                                <%= link_to "New Junior Cert English results show more pupils with good grades","https://www.independent.ie/irish-news/education/exams/new-junior-cert-english-results-show-more-pupils-with-good-grades-36127190.html",  :class => "a", :target => "_blank"%></td>
+                                                <%#= link_to "New Junior Cert English results show more pupils with good grades","https://www.independent.ie/irish-news/education/exams/new-junior-cert-english-results-show-more-pupils-with-good-grades-36127190.html",  :class => "a", :target => "_blank"%></td>
                                                 
                                             </td>
                                            
@@ -201,7 +434,7 @@
                                             </td>
                                             
                                             <td>
-                                             <%= link_to "College place offers being snapped up by students","https://www.independent.ie/irish-news/education/exams/college-place-offers-being-snapped-up-by-students-36056013.html",  :class => "a", :target => "_blank"%></td>
+                                             <%#= link_to "College place offers being snapped up by students","https://www.independent.ie/irish-news/education/exams/college-place-offers-being-snapped-up-by-students-36056013.html",  :class => "a", :target => "_blank"%></td>
                                          </td>
                                          
                                     </tr>
@@ -210,7 +443,7 @@
                                            
                                         </td>
                                         <td>
-                                           <%= link_to "Answers to the most common questions on the CAO system","https://www.independent.ie/irish-news/education/exams/answers-to-the-most-common-questions-on-the-cao-system-36056003.html",  :class => "a", :target => "_blank"%></td>
+                                           <%#= link_to "Answers to the most common questions on the CAO system","https://www.independent.ie/irish-news/education/exams/answers-to-the-most-common-questions-on-the-cao-system-36056003.html",  :class => "a", :target => "_blank"%></td>
                                            
                                        </td>
                                        
@@ -220,7 +453,7 @@
                                            
                                         </td>
                                         <td>
-                                           <%= link_to "Bullied students tormented about ‘weight or appearance’","https://www.irishtimes.com/news/education/bullied-students-tormented-about-weight-or-appearance-1.3473117",  :class => "a", :target => "_blank"%></td>
+                                           <%#= link_to "Bullied students tormented about ‘weight or appearance’","https://www.irishtimes.com/news/education/bullied-students-tormented-about-weight-or-appearance-1.3473117",  :class => "a", :target => "_blank"%></td>
                                            
                                        </td>
                                        
@@ -230,14 +463,14 @@
                                            
                                         </td>
                                         <td>
-                                           <%= link_to "Shortages of examiners across all subjects looms weeks before Leaving Cert","https://www.irishtimes.com/news/education/shortages-of-examiners-across-all-subjects-looms-weeks-before-leaving-cert-1.3473025",  :class => "a", :target => "_blank"%></td>
+                                           <%#= link_to "Shortages of examiners across all subjects looms weeks before Leaving Cert","https://www.irishtimes.com/news/education/shortages-of-examiners-across-all-subjects-looms-weeks-before-leaving-cert-1.3473025",  :class => "a", :target => "_blank"%></td>
                                            
                                        </td>
                                        
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
+                    </div>                                             
 
                     <div class="footer">
                         <hr>
@@ -247,8 +480,13 @@
                     </div>
                 </div>
             </div>
+            
         </div>
+        
+            -->
     </div>
+    
+
 </div>
 </div>
 

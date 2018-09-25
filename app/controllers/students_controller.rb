@@ -23,7 +23,7 @@ include UsersHelper
    #password and user params can be connected to the database and a SchoolApp admin could 
    #update it once request is made by the school to access the teacher dashboard
    #dynamic password will change every day 
-   http_basic_authenticate_with :name => "@user", :password => @date + "12345"
+   #http_basic_authenticate_with :name => "@user", :password => @date + "12345"
   
 
   def search

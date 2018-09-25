@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
     
+  resources :archives
     resources :students do 
         resources :results
     end
@@ -31,7 +32,7 @@ Rails.application.routes.draw do
     #ROOT PAGE IS THE STATI_COTROLLER'S INDEX METHOD WHICH WILL BE RENDERED IN VIEWS
     root 'static_pages#home'
     get '/about' => 'static_pages#about'
- 
+
 
 	match ':controller(/:action(/:id))', :via => :get
 

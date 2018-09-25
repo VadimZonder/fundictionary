@@ -8,8 +8,21 @@ class StaticPagesController < ActionController::Base
 
   def home
    @time = Time.now.strftime("%B %e, %Y at %I:%M %p")
+   @archive = Archive.all
+   
+   
   end
 
+
+ def search
+    @search_term = params[:q]
+    #@the search term is what will be presented in q
+    @st ="%#{params[:q]}%"
+    #seatchterm will be used to search in students table searchin for the first name here
+    #@students = Student.where("lower(email) like (?) or lower(surname) like (?) or lower(school) like (?)", st.downcase, st.downcase, st.downcase)
+  end
+  
+  
  def about
  
  end

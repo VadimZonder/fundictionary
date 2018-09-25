@@ -8,6 +8,149 @@
 
 <%= render 'layouts/header' %>
 
+<%#You can connect through a proxy, 
+and if you have a list of proxy addresses then you can tell ruby to change proxy every x minutes, 
+this will result in a change of the IP that the website thinks you have. 
+Here's a code to scrape google search results through a proxy, 
+to use a proxy list just extend the code a bit.
+%>
+<%= 
+#DONT FOR GET TO READ UP MORE ON HOW DETECTD AN  CLEAR COOKIES
+require "nokogiri" 
+require 'rubygems'
+require 'mechanize'
+
+###agent = Mechanize.new
+#create an array of working ip addresses and a corresponding port that can be called by indexses (or automaticall get from 'https://free-proxy-list.net/anonymous-proxy.html' and others)
+###agent.set_proxy '208.86.71.228', 39913
+#IMPORTAN get all the possible info collected about 1.the client. 2. changeIP, 3.Change cookies. 4.Time and frequency randomised. 5. Browser and etc  P.S. delete this line
+#create an array of browsers
+###agent.user_agent_alias = 'Windows IE 9'
+
+###page = agent.get('https://www.iplocation.net/')
+
+#random function 10.2 minutes
+
+###@title = page.title
+
+###@ip_address = request.remote_ip
+
+#@another_ip=request.headers['HTTP_X_FORWARDED_FOR']
+###@p = page.at('p').text.strip
+#@body = page.at('body').text.strip
+###@table =page.at('table').text.strip 
+#puts "the tile of the page is: "#+title
+%>
+<h4 class="title">the tietle of the page is  "<%##=@title  %>" and your IP is "<%##=@ip_address  %>" and body is "<##%=@another_ip %>"</h4>
+
+<br>
+<%##=@table  %>
+<%#
+google_form = page.form('f')
+google_form.q = 'new york city council'
+
+page = agent.submit(google_form, google_form.buttons.first)
+
+page.links.each do |link|
+
+    if link.href.to_s =~/url.q/
+    #if page.links[0].to_s =~/url.q/
+        str=link.href.to_s
+        strList=str.split(%r{=|&}) 
+        
+           #   delay_time=rand(11)
+        #sleep(delay_time)     
+ 
+        url=strList[1] 
+        puts url
+      
+      
+    end 
+end
+ %>
+ 
+ <!--the line below is taken from a template and I added a class-->
+ <div class="content purple-horizontal" >
+    <!--the line below is taken from a template-->
+    <div class="container-fluid "  >
+        <!--the line below is taken from a template-->
+        <div class="row">
+           <!--PARENT WINDOW -->
+           <!--the line below is taken from a template + I changed the size-->
+           <div class="col-md-12 hover" >
+             <!--the line below is taken from a template and I added a class--> 
+             <div class="card  purple-button ">
+ <%= render 'layouts/search' %>
+                 
+                <%#= link_to({:controller => 'parents', :action => 'index'}) do %>
+                <div class="header ">
+                  <%# !!!!! ADD A SEARCH BAR THAT ON SUBMIT WILL ADD SEARCHED TERM TO THE END OF THE URL AND SEARCH%>  
+                     <%
+                            require "nokogiri" 
+                          require "rest-client"
+                          
+                         @urlBasic = "http://www.yourdictionary.com/"
+                          
+                          searchedWord = @urlBasic+@search_term
+                          
+                         urlFull="http://www.yourdictionary.com/contrast"
+
+                          html=RestClient.get(searchedWord)
+                          
+                          @urlSplit = urlFull.split('/')
+                           
+                          
+                           %>
+                  
+                    <h4 class="title">Definition of "<%=@urlSplit[-1]  %>"</h4>
+                    <p class="category">See your student's results "<%=@search_term %>" </p>
+                </div>
+                
+                
+                <div class="content">
+                    <!--content space-->
+                    <br><br><br>
+                   <%= 
+                         
+                           doc=Nokogiri::HTML.parse(html)
+                          
+                          
+                          
+                          articles=doc.css('.sense')#.text#.html_safe#
+                         
+                         #defn = articles.at_css "ol"
+                         defnToHtml = articles.to_html
+                        defnToHtml.html_safe
+                          
+                          %>
+                    
+                    
+                    
+                    
+                    
+                    
+                    <br><br>
+                    <!-- <div id="chartPreferences" class="ct-chart ct-perfect-fourth"></div>-->
+                    <%# link_to image_tag("parents.jpg",class:"image-buttons", id:"parents_image", :size => '168x98') %>
+
+                    <!--the line below is taken from a template-->
+                    <div class="footer">
+                        <!--the line below is taken from a template-->
+                        <div class="legend">
+                           <!--the line below is taken from a template-->
+                           <i></i> Parent,
+                           <i></i> Click
+                           <i></i> Here
+                       </div>
+                       <hr> <!--the line below is taken from a template-->
+                       <div class="stats">
+                           <!--the line below is taken from a template-->
+                           <i class="fa fa-pie-chart"></i> Total Analysis of Marks
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
 <div class="content purple-horizontal">
     <div class="col-md-12">
        
@@ -15,90 +158,11 @@
             <div class="container-fluid">
                 
                 <h2>You searched for "<%= @search_term %>" </h2>
-                
-                <% if @students.length ==0 %>
-                <div class="header">
-                    <h4 class="title">No students are with that parameter in the Database.</h4>
-                    <h4 class="title">Make sure your spelling is correct and if so then that </h4>
-                    <h4 class="title">means that there are no students created yet with this parameter.</h4>
-
-                    <br>
-                </div>
-            </div>
-        </div>
-        <% else %>
-
-
-
+              
         
-
-
-
-        <div class="header">
-            
-           
-            <h4 class="title">Found Students</h4>
-            
-        </div>
+              
+              
         
-        <div class="content">
-            <table class="table table-hover">
-                <thead>
-                    <th class="text-left">Name</th>
-                    <th class="text-center">Date of Birth</th>
-                    <th class="text-center">School</th>
-                    <th class="text-center">Email</th>
-                    <th class="text-center">Results</th>
-                    <th class="text-center">Comment</th>
-                    <th class="text-center">Edit/Delete</th>
-                </thead>
-                
-
-                
-                <!--ROW 1 -->
-                <!-- check if the code below works. if deleting the table all works so the prob is in the tble / the prob is that for sure the lfilters themselves is more than 0-->
-                <!--    -->
-
-                <tbody>
-                    
-                   <tr>
-                       <!--ADD IF NO PFILTERS to display no filters result-->
-                       <!--IF ONE STUDENT IS THE RESULT OF THE FILTER THEN MAYBE GO STRAIGN TO MARKS?-->
-                       
-                       
-                       <% @students.each do |student| %>
-
-                       <tr>
-                        <td class="text-left"><%= link_to "#{student.name} ", student %><%= student.surname  %></td>
-                        <td class="text-center"><%= "#{student.day_of_birth} /" %>  
-                            <%= "#{student.month_of_birth} /"%>
-                            <%= student.year_of_birth %></td>
-                            <td class="text-center"> <%= student.school %></td>
-                            <td class="text-center"> <%= student.email %></td>
-                            <td class="text-center"><%= link_to("Results", {:controller => 'results', :action => 'teacher_result', :id =>  student.email}) %>
-                            </td>
-                            <td class="text-center"> <%= student.comment %></td>
-                            <!--make the whole page not work if not signed in and delte this sing in-->
-                            <td  class="text-center"><% if current_user %>
-                              <%= link_to 'Edit', edit_student_path(student) %>/
-                              <%= link_to 'Delete', student, method: :delete, data: { confirm: 'Are you sure?' } %>
-                          </td>
-
-                          <% end %>
-                          <% end %>
-
-
-
-                      </tbody>
-
-
-                  </td>
-              </tr>
-              
-              <%end%>
-              
-              
-          </table>
           
           <br>
           <p class="category"><%= link_to ' ADD a New Student', new_student_path, class: "btn purple-button" %></p>
